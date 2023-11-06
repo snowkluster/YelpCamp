@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import methodOverride from "method-override"
 import mongoose from "mongoose";
 import morgan from "morgan";
+import ejsmate from "ejs-mate"
 import { Campground } from "./models/campground.js";
 
 const port = 3000
@@ -22,6 +23,7 @@ async function main() {
     await mongoose.connect('mongodb://127.0.0.1:27017/yelpcamp')
 }
 
+app.engine("ejs",ejsmate)
 app.use(methodOverride('_method'))
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, 'public')))
@@ -73,7 +75,7 @@ app.delete("/campground/:id", async (req, res) => {
 })
 
 app.use((req,res) => {
-    res.render('404');
+    res.status(404).render('404');
 })
 
 app.listen(port,() => {

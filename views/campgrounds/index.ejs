@@ -1,19 +1,14 @@
-<%- include('../partials/header') %>
+<% layout('layouts/boilerplate') -%>
 
-    <%- include('../partials/navbar') %>
-
-        <div class="list-group">
-            <div class="">
-                <a href="#" class="list-group-item list-group-item-action active rounded-0">
-                    List of CampGrounds
-                </a>
-            </div>
-            <% for (const iterator of campground) { %>
-                <a href="/campground/<%= iterator._id %>" class="list-group-item list-group-item-action rounded-0">
-                    <%= iterator.title %>
-                </a>
-                <% } %>
-        </div>
-
-
-        <%- include('../partials/footer') %>
+<div class="list-group">
+    <div class="">
+        <a href="#" class="list-group-item list-group-item-action active rounded-0">
+            List of CampGrounds
+        </a>
+    </div>
+    <% for (const iterator of campground) { %>
+        <a href="/campground/<%= iterator._id %>" class="list-group-item list-group-item-action rounded-0">
+            <%= iterator.title %>
+        </a>
+        <% } %>
+</div>
