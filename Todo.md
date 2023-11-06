@@ -1,1 +1,3 @@
 - https://github.com/Colt/YelpCamp/
+- move to bootstrap cards for index page 
+- style the YelpCamp App
