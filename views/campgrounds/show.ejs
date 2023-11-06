@@ -1,0 +1,17 @@
+<%- include('../partials/header') %>
+
+<%- include('../partials/navbar') %>
+
+<div class="container d-flex flex-column">
+    <p class="display-2 "> <%= campground.title %></p>
+    <p class="display-4"><%= campground.location %></p>
+    <div class="d-grid gap-2 d-md-block">
+        <a href="/campground/<%= campground._id %>/edit" class="btn btn-primary">Edit</a>
+        <a href="/campground" class="btn btn-warning">Back</a>
+        <form action="/campground/<%= campground._id %>?_method=DELETE" method="POST" class="d-inline">
+            <button class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+</div>
+
+<%- include('../partials/footer') %>

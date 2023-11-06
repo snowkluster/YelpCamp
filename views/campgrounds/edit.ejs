@@ -1,0 +1,25 @@
+<%- include('../partials/header') %>
+
+<%- include('../partials/navbar') %>
+
+
+
+<div class="container">
+    <p class="display-2 "> <%= campground.title %> Edit Page</p>
+    <form action="/campground/<%= campground._id %>?_method=PUT" method="post" >
+        <div class="form-group m-1">
+          <label for="ctitle" class="display-6 m-2">CampGround Title</label>
+          <input type="text" class="form-control" id="ctitle" name="campground[title]" placeholder="Enter Name" value="<%= campground.title %>"  required >
+        </div>
+        <div class="form-group m-1">
+          <label for="clocation" class="display-6 m-2">Locaton of CampGround</label>
+          <input type="text" class="form-control" id="clocation" name="campground[location]" placeholder="Enter Locaton" required value="<%= campground.location %>">
+        </div>
+        <button class="btn btn-primary m-2">Submit</button>
+        <a href="/campground/<%= campground._id %>" class="btn btn-warning m-2">Cancel</a>
+      </form>
+      
+</div>
+
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,21 @@
+<%- include('../partials/header') %>
+
+<%- include('../partials/navbar') %>
+
+<div class="container">
+    <form action="/campground" method="post" >
+        <div class="form-group m-1">
+          <label for="ctitle" class="display-6 m-2">CampGround Title</label>
+          <input type="text" class="form-control" id="ctitle" name="campground[title]" placeholder="Enter Name" required>
+        </div>
+        <div class="form-group m-1">
+          <label for="clocation" class="display-6 m-2">Locaton of CampGround</label>
+          <input type="text" class="form-control" id="clocation" name="campground[location]" placeholder="Enter Locaton" required>
+        </div>
+        <button class="btn btn-primary m-2">Submit</button>
+        <a href="/campground" class="btn btn-warning m-2">Back</a>
+      </form>
+</div>
+
+
+<%- include('../partials/footer') %>
