@@ -72,6 +72,10 @@ app.delete("/campground/:id", async (req, res) => {
     res.redirect(302, "/campground")
 })
 
+app.use((req,res) => {
+    res.render('404');
+})
+
 app.listen(port,() => {
     console.log(`server running on port ${port}`);
 });
