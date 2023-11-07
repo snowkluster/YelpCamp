@@ -1,14 +1,17 @@
 <% layout('layouts/boilerplate') -%>
 
-<div class="list-group">
-    <div class="">
-        <a href="#" class="list-group-item list-group-item-action active rounded-0">
-            List of CampGrounds
-        </a>
-    </div>
+<div class=" row row-cols-1 row-cols-md-4 g-4">
     <% for (const iterator of campground) { %>
-        <a href="/campground/<%= iterator._id %>" class="list-group-item list-group-item-action rounded-0">
-            <%= iterator.title %>
-        </a>
-        <% } %>
+        <div class="column">
+        <div class="card " style="width: 18rem;">
+            <img src="<%= iterator.image %> " class="card-img-top" style="height:10rem;" alt="...">
+            <div class="card-body">
+              <h5 class="card-title"><%= iterator.title %></h5>
+              <p class="card-text"><%= iterator.description %></p>
+              <a href="/campground/<%= iterator._id %>" class="btn btn-primary">View Site</a>
+            </div>
+          </div>
+        </div>
+    <% } %>
 </div>
+
