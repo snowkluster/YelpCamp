@@ -5,8 +5,10 @@ import methodOverride from "method-override"
 import mongoose from "mongoose";
 import morgan from "morgan";
 import ejsmate from "ejs-mate"
+import { campgroundSchema } from "./schema.js";
 import { Campground } from "./models/campground.js";
-import { AppError } from "./error.js";
+import { AppError } from "./util/error.js";
+import { wrapAsync } from "./util/catchAsync.js";
 
 const port = 3000
 const app = express();
@@ -31,21 +33,15 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, '/views'));
 
-function wrapAsync(fn){
-    return function(req, res, next) {
-        fn(req, res, next).catch(e =>next(e))
-    }
-}
-
 app.get("/", (req, res) => {
     res.render('home')
 })
 
-app.post("/campground", async (req, res,next) => {
+app.post("/campground",validateSchema, wrapAsync(async (req, res, next) => {
     const newCamp = new Campground(req.body.campground);
     await newCamp.save();
     res.redirect(302, `/campground/${newCamp._id}`)
-})
+}))
 
 app.get("/campground", wrapAsync(async (req, res, next) => {
     const campground = await Campground.find({})
@@ -80,11 +76,11 @@ app.get("/campground/:id", wrapAsync(async (req, res, next) => {
     }
 }))
 
-app.put("/campground/:id", async (req, res, next) => {
+app.put("/campground/:id",validateSchema,wrapAsync( async (req, res, next) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
     res.redirect(302, `/campground/${campground._id}`);
-})
+}))
 
 app.delete("/campground/:id", async (req, res, next) => {
     const { id } = req.params;
@@ -101,9 +97,24 @@ app.delete("/campground/:id", async (req, res, next) => {
     }
 })
 
+app.all("*", (req, res, next) => {
+    next(new AppError('Page not found', 404))
+})
+
+
+function validateSchema(req,res,next){
+    const result = campgroundSchema.validate(req.body);
+    if (result.error) {
+        throw new AppError("CANNOT VALIDATE", 403)
+    }
+}
+
 app.use((err, req, res, next) => {
     const { status = 500 } = err;
-    res.status(status).render('404');
+    if (status === 404) {
+        res.status(status).render('404');
+    }
+    res.status(status).render('Error', { err });
 })
 
 app.listen(port, () => {
