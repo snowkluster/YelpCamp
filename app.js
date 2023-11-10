@@ -31,20 +31,30 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, '/views'));
 
+function wrapAsync(fn){
+    return function(req, res, next) {
+        fn(req, res, next).catch(e =>next(e))
+    }
+}
+
 app.get("/", (req, res) => {
     res.render('home')
 })
 
-app.post("/campground", async (req, res) => {
+app.post("/campground", async (req, res,next) => {
     const newCamp = new Campground(req.body.campground);
     await newCamp.save();
     res.redirect(302, `/campground/${newCamp._id}`)
 })
 
-app.get("/campground", async (req, res) => {
+app.get("/campground", wrapAsync(async (req, res, next) => {
     const campground = await Campground.find({})
-    res.render('campgrounds/index', { campground })
-});
+    if (!campground) {
+        throw new AppError('CANNOT FIND PAGE', 404)
+    } else {
+        res.render('campgrounds/index', { campground })
+    }
+}));
 
 app.get('/campground/:id/edit', async (req, res) => {
     const { id } = req.params
@@ -56,19 +66,19 @@ app.get('/campground/new', (req, res) => {
     res.render('campgrounds/new')
 })
 
-app.get("/campground/:id", async (req, res, next) => {
+app.get("/campground/:id", wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     try {
         const campground = await Campground.findById(id);
         if (!campground) {
-            throw next(new AppError('CANNOT FIND PAGE', 404))
+            throw new AppError('CANNOT FIND PAGE', 404)
         } else {
             res.render('campgrounds/show', { campground })
         }
     } catch (error) {
         next(error)
     }
-})
+}))
 
 app.put("/campground/:id", async (req, res, next) => {
     const { id } = req.params;
@@ -92,10 +102,8 @@ app.delete("/campground/:id", async (req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-    const { message = 'Error finding value', status = 500 } = err;
+    const { status = 500 } = err;
     res.status(status).render('404');
-    console.log(message);
-    console.log(err.stack);
 })
 
 app.listen(port, () => {
