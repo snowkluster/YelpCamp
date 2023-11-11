@@ -100,6 +100,18 @@ app.delete("/campground/:id", wrapAsync(async (req, res, next) => {
     }
 }))
 
+app.delete("/campground/:id/reviews/:reviewId",wrapAsync(async(req,res,next)=>{
+    const {id, reviewId } = req.params;
+    await Campground.findByIdAndUpdate(id, {$pull: { reviews : reviewId}})
+    const deleteReview = await Review.findByIdAndDelete(reviewId);
+    if (!deleteReview) {
+        throw next(new AppError('CANNOT DELETE CAMP', 404))
+    } else {
+        console.log(`deleted ${JSON.stringify(deleteReview)}`)
+        res.redirect(302, `/campground/${id}`)
+    }
+}))
+
 app.all("*", (req, res, next) => {
     next(new AppError('Page not found', 404))
 })
