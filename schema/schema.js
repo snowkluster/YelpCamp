@@ -11,4 +11,11 @@ const campgroundSchema = Joi.object({
     }).required()
 })
 
-export {campgroundSchema}
+const reviewSchema = Joi.object({
+    review: Joi.object({
+        body: Joi.string().required(),
+        rating: Joi.number().required().max(5).min(1)
+    }).required()
+})
+
+export {campgroundSchema, reviewSchema}

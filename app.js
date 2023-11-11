@@ -5,10 +5,11 @@ import methodOverride from "method-override"
 import mongoose from "mongoose";
 import morgan from "morgan";
 import ejsmate from "ejs-mate"
-import { campgroundSchema } from "./schema.js";
+import { campgroundSchema, reviewSchema } from "./schema/schema.js";
 import { Campground } from "./models/campground.js";
 import { AppError } from "./util/error.js";
 import { wrapAsync } from "./util/catchAsync.js";
+import { Review } from "./models/review.js";
 
 const port = 3000
 const app = express();
@@ -37,7 +38,7 @@ app.get("/", (req, res) => {
     res.render('home')
 })
 
-app.post("/campground",validateSchema, wrapAsync(async (req, res, next) => {
+app.post("/campground", validateSchema, wrapAsync(async (req, res, next) => {
     const newCamp = new Campground(req.body.campground);
     await newCamp.save();
     res.redirect(302, `/campground/${newCamp._id}`)
@@ -76,13 +77,23 @@ app.get("/campground/:id", wrapAsync(async (req, res, next) => {
     }
 }))
 
-app.put("/campground/:id",validateSchema,wrapAsync( async (req, res, next) => {
+app.put("/campground/:id", validateSchema, wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
     res.redirect(302, `/campground/${campground._id}`);
 }))
 
-app.delete("/campground/:id", async (req, res, next) => {
+app.post("/campground/:id/reviews", validateReviewSchema ,wrapAsync(async (req, res,next) => {
+    const campground = await Campground.findById(req.params.id)
+    console.log(req.body.review)
+    const newReview = new Review(req.body.review)
+    campground.reviews.push(newReview);
+    await newReview.save()
+    await campground.save()
+    res.redirect(302, `/campground/${campground.id}`)
+}))
+
+app.delete("/campground/:id", wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     try {
         const deletedCamp = await Campground.findByIdAndDelete(id);
@@ -95,16 +106,27 @@ app.delete("/campground/:id", async (req, res, next) => {
     } catch (error) {
         next(error)
     }
-})
+}))
 
 app.all("*", (req, res, next) => {
     next(new AppError('Page not found', 404))
 })
 
-function validateSchema(req,res,next){
+function validateSchema(req, res, next) {
     const result = campgroundSchema.validate(req.body);
     if (result.error) {
         throw new AppError("CANNOT VALIDATE", 403)
+    } else {
+        next()
+    }
+}
+
+function validateReviewSchema(req,res,next) {
+    const result = reviewSchema.validate(req.body);
+    if (result.error) {
+        throw new AppError("CANNOT VALIDATE REVIEW", 403)
+    } else {
+        next()
     }
 }
 
