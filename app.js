@@ -101,7 +101,6 @@ app.all("*", (req, res, next) => {
     next(new AppError('Page not found', 404))
 })
 
-
 function validateSchema(req,res,next){
     const result = campgroundSchema.validate(req.body);
     if (result.error) {
