@@ -7,12 +7,14 @@ import morgan from "morgan";
 import ejsmate from "ejs-mate"
 import { router } from "./routes/campgrounds.js";
 import { AppError } from "./util/error.js";
+import cookieParser from "cookie-parser";
 
 const port = 3000
 const app = express();
 
 app.use(morgan('dev'))
 app.use(express.json())
+app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
 main().catch(err => console.log(err));
@@ -31,11 +33,10 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, '/views'));
 
-app.use('/campground', router)
-
 app.get("/", (req, res) => {
     res.render('home')
 })
+app.use('/campground', router)
 
 app.all("*", (req, res, next) => {
     next(new AppError('Page not found', 404))
@@ -46,6 +47,7 @@ app.use((err, req, res, next) => {
     if (status === 404) {
         res.status(status).render('404');
     }
+    console.log(err.stack);
     res.status(status).render('Error', { err });
 })
 
