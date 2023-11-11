@@ -65,16 +65,8 @@ app.get('/campground/new', (req, res) => {
 
 app.get("/campground/:id", wrapAsync(async (req, res, next) => {
     const { id } = req.params;
-    try {
-        const campground = await Campground.findById(id);
-        if (!campground) {
-            throw new AppError('CANNOT FIND PAGE', 404)
-        } else {
-            res.render('campgrounds/show', { campground })
-        }
-    } catch (error) {
-        next(error)
-    }
+    const campground = await Campground.findById(id).populate('reviews');
+    res.render('campgrounds/show', { campground })
 }))
 
 app.put("/campground/:id", validateSchema, wrapAsync(async (req, res, next) => {
@@ -83,7 +75,7 @@ app.put("/campground/:id", validateSchema, wrapAsync(async (req, res, next) => {
     res.redirect(302, `/campground/${campground._id}`);
 }))
 
-app.post("/campground/:id/reviews", validateReviewSchema ,wrapAsync(async (req, res,next) => {
+app.post("/campground/:id/reviews", validateReviewSchema, wrapAsync(async (req, res, next) => {
     const campground = await Campground.findById(req.params.id)
     console.log(req.body.review)
     const newReview = new Review(req.body.review)
@@ -121,7 +113,7 @@ function validateSchema(req, res, next) {
     }
 }
 
-function validateReviewSchema(req,res,next) {
+function validateReviewSchema(req, res, next) {
     const result = reviewSchema.validate(req.body);
     if (result.error) {
         throw new AppError("CANNOT VALIDATE REVIEW", 403)
