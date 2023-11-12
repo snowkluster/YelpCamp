@@ -6,6 +6,12 @@ import { wrapAsync } from "../util/catchAsync.js";
 
 const ids = express.Router({mergeParams:true});
 
+ids.get('/edit', async (req, res) => {
+    const { id } = req.params
+    const campground = await Campground.findById(id)
+    res.render('campgrounds/edit', { campground })
+})
+
 ids.route("/")
     .get(wrapAsync(async (req, res, next) => {
         const { id } = req.params;
@@ -14,7 +20,7 @@ ids.route("/")
     }))
     .put(validateSchema, wrapAsync(async (req, res, next) => {
         const { id } = req.params;
-        const campground = await Campground.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
+        const campground = await Campground.findByIdAndUpdate(id, req.body.campground, { new: true, runValidators: true })
         res.redirect(302, `/campground/${campground._id}`);
     }))
     .delete(wrapAsync(async (req, res, next) => {
