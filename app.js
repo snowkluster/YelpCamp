@@ -6,16 +6,28 @@ import mongoose from "mongoose";
 import morgan from "morgan";
 import ejsmate from "ejs-mate"
 import { router } from "./routes/campgrounds.js";
+import { reviews } from "./routes/reviews.js";
+import { ids } from "./routes/id.js";
 import { AppError } from "./util/error.js";
 import cookieParser from "cookie-parser";
+import session from "express-session";
+import flash from "connect-flash"
+
+import "dotenv/config.js"
 
 const port = 3000
+const SECRET=process.env.SECRET;
 const app = express();
 
 app.use(morgan('dev'))
+app.use(session({resave: true,
+    saveUninitialized: true,
+    secret: SECRET}))
 app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
+
+app.use(flash());
 
 main().catch(err => console.log(err));
 main().then(() => {
@@ -33,22 +45,31 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, '/views'));
 
+app.use('/campground', router)
+app.use('/campground/:id', ids)
+app.use('/campground/:id/reviews', reviews)
+
 app.get("/", (req, res) => {
     res.render('home')
 })
-app.use('/campground', router)
 
 app.all("*", (req, res, next) => {
     next(new AppError('Page not found', 404))
+})
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
 })
 
 app.use((err, req, res, next) => {
     const { status = 500 } = err;
     if (status === 404) {
         res.status(status).render('404');
+    } else {
+        res.status(status).render('Error', { err });
     }
-    console.log(err.stack);
-    res.status(status).render('Error', { err });
 })
 
 app.listen(port, () => {
