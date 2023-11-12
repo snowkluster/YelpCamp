@@ -12,7 +12,7 @@ import { AppError } from "./util/error.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import flash from "connect-flash"
-
+import bcrypt from "bcrypt";
 import "dotenv/config.js"
 
 const port = 3000
@@ -60,7 +60,7 @@ app.set("views", path.join(__dirname, '/views'));
 app.use((req,res,next) => {
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('errors');
-    next();
+    next()
 })
 
 app.use('/campground', router)

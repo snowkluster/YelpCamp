@@ -16,11 +16,19 @@ ids.route("/")
     .get(wrapAsync(async (req, res, next) => {
         const { id } = req.params;
         const campground = await Campground.findById(id).populate('reviews');
+        if(!campground){
+            req.flash('errors','cannot find that campground')
+            res.redirect('/campground')
+        }
         res.render('campgrounds/show', { campground })
     }))
     .put(validateSchema, wrapAsync(async (req, res, next) => {
         const { id } = req.params;
         const campground = await Campground.findByIdAndUpdate(id, req.body.campground, { new: true, runValidators: true })
+        if(!campground){
+            req.flash('errors','cannot find that campground')
+            res.redirect('/campground')
+        }
         req.flash('success','successfully updated campground information')
         res.redirect(302, `/campground/${campground._id}`);
     }))
