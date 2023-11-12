@@ -5,13 +5,13 @@ import { AppError } from "../util/error.js";
 import { wrapAsync } from "../util/catchAsync.js";
 
 
-const router = express.Router();
+const router = express.Router({mergeParams:true});
 
 router.route('/')
     .post(validateSchema, wrapAsync(async (req, res, next) => {
         const newCamp = new Campground(req.body.campground);
         await newCamp.save();
-        res.redirect(302, `campgrounds/${newCamp._id}`)
+        res.redirect(302, `/campground/${newCamp._id}`)
     }))
     .get(wrapAsync(async (req, res, next) => {
         const campground = await Campground.find({})

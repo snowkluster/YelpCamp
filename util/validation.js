@@ -1,4 +1,5 @@
 import { campgroundSchema, reviewSchema } from "../schema/schema.js";
+import { AppError } from "./error.js";
 
 function validateSchema(req, res, next) {
     const result = campgroundSchema.validate(req.body);
