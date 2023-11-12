@@ -13,6 +13,7 @@ reviews.post("/", validateReviewSchema, wrapAsync(async (req, res, next) => {
     campground.reviews.push(newReview);
     await newReview.save()
     await campground.save()
+    req.flash('success','successfully added a new review')
     res.redirect(302, `/campground/${campground.id}`)
 }))
 
@@ -24,6 +25,7 @@ reviews.delete("/:reviewId", wrapAsync(async (req, res, next) => {
         throw next(new AppError('CANNOT DELETE CAMP', 404))
     } else {
         console.log(`deleted ${JSON.stringify(deleteReview)}`)
+        req.flash('errors','deleted a user review')
         res.redirect(302, `/campground/${id}`)
     }
 }))

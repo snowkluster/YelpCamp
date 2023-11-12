@@ -11,6 +11,7 @@ router.route('/')
     .post(validateSchema, wrapAsync(async (req, res, next) => {
         const newCamp = new Campground(req.body.campground);
         await newCamp.save();
+        req.flash('success','successfully added a new campground')
         res.redirect(302, `/campground/${newCamp._id}`)
     }))
     .get(wrapAsync(async (req, res, next) => {

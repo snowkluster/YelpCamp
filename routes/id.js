@@ -21,6 +21,7 @@ ids.route("/")
     .put(validateSchema, wrapAsync(async (req, res, next) => {
         const { id } = req.params;
         const campground = await Campground.findByIdAndUpdate(id, req.body.campground, { new: true, runValidators: true })
+        req.flash('success','successfully updated campground information')
         res.redirect(302, `/campground/${campground._id}`);
     }))
     .delete(wrapAsync(async (req, res, next) => {
@@ -30,6 +31,7 @@ ids.route("/")
                 throw next(new AppError('CANNOT DELETE CAMP', 404))
             } else {
                 console.log(`deleted ${JSON.stringify(deletedCamp)}`)
+                req.flash('errors','successfully deleted a campground')
                 res.redirect(302, "/campground")
             }
     }))
