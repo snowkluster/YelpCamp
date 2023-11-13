@@ -8,11 +8,13 @@ import ejsmate from "ejs-mate"
 import { router } from "./routes/campgrounds.js";
 import { reviews } from "./routes/reviews.js";
 import { ids } from "./routes/id.js";
+import { users } from "./routes/users.js";
 import { AppError } from "./util/error.js";
-import cookieParser from "cookie-parser";
+import { User } from "./models/user.js";
 import session from "express-session";
 import flash from "connect-flash"
-import bcrypt from "bcrypt";
+import passport from "passport";
+import passportLocal from "passport-local"
 import "dotenv/config.js"
 
 const port = 3000
@@ -20,15 +22,11 @@ const SECRET=process.env.SECRET;
 const app = express();
 
 app.use(morgan('dev'))
-app.use(session({resave: true,
-    saveUninitialized: true,
-    secret: SECRET}))
 app.use(express.json())
-app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
 const sessionConfig = {
-    secret: 'thisshouldbeabettersecret!',
+    secret: SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -39,7 +37,7 @@ const sessionConfig = {
 }
 
 app.use(session(sessionConfig))
-app.use(flash());
+app.use(flash())
 
 main().catch(err => console.log(err));
 main().then(() => {
@@ -57,7 +55,15 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, '/views'));
 
+app.use(passport.initialize())
+app.use(passport.session())
+passport.use(new passportLocal(User.authenticate()))
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser())
+
 app.use((req,res,next) => {
+    res.locals.currentUser = req.user
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('errors');
     next()
@@ -66,6 +72,7 @@ app.use((req,res,next) => {
 app.use('/campground', router)
 app.use('/campground/:id', ids)
 app.use('/campground/:id/reviews', reviews)
+app.use('/', users)
 
 app.get("/", (req, res) => {
     res.render('home')
