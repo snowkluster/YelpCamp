@@ -8,8 +8,8 @@
 49 -- done
 50 -- done
 51 -- done
-52 -- do
-53 -- do
+52 -- done
+53 -- done
 54 -- do
 55 -- do
 56

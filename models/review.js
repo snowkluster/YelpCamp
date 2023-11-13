@@ -2,7 +2,11 @@ import mongoose, { Schema } from "mongoose";
 
 const reviewSchema = new Schema({
     body: String,
-    rating: Number
+    rating: Number,
+    author: {
+        type: Schema.Types.ObjectId,
+        ref:'User'
+    }
 })
 
 export const Review = mongoose.model('Review',reviewSchema);

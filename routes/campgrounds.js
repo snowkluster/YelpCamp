@@ -11,6 +11,7 @@ const router = express.Router({ mergeParams: true });
 router.route('/')
     .post(isLoggedIn,validateSchema, wrapAsync(async (req, res, next) => {
         const newCamp = new Campground(req.body.campground);
+        newCamp.author = req.user._id
         await newCamp.save();
         req.flash('success', 'successfully added a new campground')
         res.redirect(302, `/campground/${newCamp._id}`)

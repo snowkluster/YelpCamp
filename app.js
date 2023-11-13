@@ -16,14 +16,7 @@ import flash from "connect-flash"
 import passport from "passport";
 import passportLocal from "passport-local"
 import "dotenv/config.js"
-
-const port = 3000
 const SECRET=process.env.SECRET;
-const app = express();
-
-app.use(morgan('dev'))
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
 
 const sessionConfig = {
     secret: SECRET,
@@ -36,8 +29,8 @@ const sessionConfig = {
     }
 }
 
-app.use(session(sessionConfig))
-app.use(flash())
+const port = 3000
+const app = express();
 
 main().catch(err => console.log(err));
 main().then(() => {
@@ -55,6 +48,12 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, '/views'));
 
+app.use(morgan('dev'))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+app.use(session(sessionConfig))
+app.use(flash())
 app.use(passport.initialize())
 app.use(passport.session())
 passport.use(new passportLocal(User.authenticate()))

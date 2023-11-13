@@ -4,12 +4,14 @@ import { Review } from "../models/review.js";
 import { Campground } from "../models/campground.js";
 import { AppError } from "../util/error.js";
 import { wrapAsync } from "../util/catchAsync.js";
+import { isLoggedIn, isReviewAuthor } from "../middleware/middle.js";
 
 const reviews = express.Router({mergeParams:true});
 
-reviews.post("/", validateReviewSchema, wrapAsync(async (req, res, next) => {
+reviews.post("/", isLoggedIn ,validateReviewSchema, wrapAsync(async (req, res, next) => {
     const campground = await Campground.findById(req.params.id)
     const newReview = new Review(req.body.review)
+    newReview.author = req.user._id
     campground.reviews.push(newReview);
     await newReview.save()
     await campground.save()
@@ -17,7 +19,7 @@ reviews.post("/", validateReviewSchema, wrapAsync(async (req, res, next) => {
     res.redirect(302, `/campground/${campground.id}`)
 }))
 
-reviews.delete("/:reviewId", wrapAsync(async (req, res, next) => {
+reviews.delete("/:reviewId",isLoggedIn, isReviewAuthor, wrapAsync(async (req, res, next) => {
     const { id, reviewId } = req.params;
     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
     const deleteReview = await Review.findByIdAndDelete(reviewId);
