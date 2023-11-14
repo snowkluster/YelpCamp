@@ -2,10 +2,15 @@ import mongoose from "mongoose";
 import { Review } from "./review.js";
 const Schema = mongoose.Schema;
 
+const ImageSchema = new Schema({
+    url: String,
+    filename: String
+});
+
 const CampgroundSchema = new Schema({
     title: String,
     price: Number,
-    image: String,
+    images: [ImageSchema],
     description: String,
     location: String,
     author: {

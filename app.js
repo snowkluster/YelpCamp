@@ -15,7 +15,11 @@ import session from "express-session";
 import flash from "connect-flash"
 import passport from "passport";
 import passportLocal from "passport-local"
-import "dotenv/config.js"
+import dotenv from "dotenv"
+
+if(process.env.NODE_ENV !== "production"){
+    dotenv.config()
+}
 const SECRET=process.env.SECRET;
 
 const sessionConfig = {

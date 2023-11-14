@@ -10,9 +10,9 @@
 51 -- done
 52 -- done
 53 -- done
-54 -- do
-55 -- do
-56 -- do
+54 -- done
+55 -- done
+56 -- done
 57 -- do
 58
 59

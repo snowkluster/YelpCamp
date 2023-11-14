@@ -3,7 +3,11 @@ import { Campground } from "../models/campground.js";
 import { cities } from "./cities.js";
 import { descriptors, places } from "./seedHelpers.js";
 import axios from "axios";
-import 'dotenv/config'
+import dotenv from "dotenv"
+
+if(process.env.NODE_ENV !== "production"){
+    dotenv.config()
+}
 
 mongoose.set('strictQuery', true);
 const apikey=process.env.API_KEY;
