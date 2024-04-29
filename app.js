@@ -16,13 +16,24 @@ import flash from "connect-flash"
 import passport from "passport";
 import passportLocal from "passport-local"
 import dotenv from "dotenv"
+import MongoStore from 'connect-mongo';
 
 if(process.env.NODE_ENV !== "production"){
     dotenv.config()
 }
 const SECRET=process.env.SECRET;
 
+const store = MongoStore.create({
+    mongoUrl: "mongodb://127.0.0.1:27017/yelpcamp",
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret: SECRET
+    }
+})
+
+
 const sessionConfig = {
+    store,
     secret: SECRET,
     resave: false,
     saveUninitialized: true,
